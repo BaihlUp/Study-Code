@@ -1,0 +1,25 @@
+
+#include <net/sock.h>
+#include <linux/tcp.h>
+
+kprobe:__tcp_transmit_skb / comm == "nginx" /
+{
+	$sk = (struct sock*)arg0;
+
+        $raddr = ntop($sk->__sk_common.skc_daddr);
+        $laddr = ntop($sk->__sk_common.skc_rcv_saddr);
+
+        $lport = $sk->__sk_common.skc_num;
+        $rport = $sk->__sk_common.skc_dport;
+	
+	$rport = (($rport & 0xFF00) >> 8) | (($rport & 0x00FF) << 8);
+
+	$tp = (struct tcp_sock*)$sk;
+	$rbytes = $tp->bytes_received;
+
+
+        time("%H:%M:%S");
+        printf("%6d %10s ", pid, comm);
+        printf("%20s:%6d %20s:%6d %lld:%lld\n", $raddr, $rport, $laddr, $lport, $rbytes, $tp->bytes_acked);
+
+}

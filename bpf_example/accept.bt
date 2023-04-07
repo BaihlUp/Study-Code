@@ -1,0 +1,30 @@
+
+
+#include <net/sock.h>
+
+BEGIN 
+{
+	printf("%8s %6s %10s ", "TIME", "PID", "COMM");
+	printf("%20s %6s %20s %6s\n", "RADDR", "RPORT", "LADDR", "LPORT");
+}
+
+kretprobe:inet_csk_accept
+{
+	$sk = (struct sock*)retval;
+	
+	$raddr = ntop($sk->__sk_common.skc_daddr);
+	$laddr = ntop($sk->__sk_common.skc_rcv_saddr);
+
+	$lport = $sk->__sk_common.skc_num;
+	$rport = $sk->__sk_common.skc_dport;
+
+	$rport = (($rport & 0xFF00) >> 8) | (($rport & 0x00FF) << 8);
+
+	time("%H:%M:%S");
+	printf("%6d %10s ", pid, comm);
+	printf("%20s:%6d %20s:%6d\n", $raddr, $rport, $laddr, $lport);
+
+}
+
+
+
