@@ -6,7 +6,7 @@ from pathlib import Path
 from openai import OpenAI
 
 # Initialize OpenAI client
-client = OpenAI(api_key='sk-Ho5wG3YJ6KpOROgk7c62Ad586d90495e858fB8FfF55898D8', base_url='https://oneai.evanora.top/v1')
+client = OpenAI(api_key='sk-xxxxxxx', base_url='https://oneai.evanora.top/v1')
 
 def generate_speech_to_file(text: str, model: str = "tts-1", voice: str = "alloy", filename: str = "speech.mp3"):
     """
